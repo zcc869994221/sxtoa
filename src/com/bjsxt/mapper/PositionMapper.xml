@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bjsxt.mapper.PositionMapper">
+	<insert id="save" parameterType="Position">
+		insert into position values(#{posid},#{pname},#{pdesc})
+	</insert>
+	<select id="selPosById" resultType="Position" parameterType="_int">
+		select * from position where posid=#{0}
+	</select>
+	<select id="findAll" resultType="Position">
+		select * from position
+	</select>
+	<delete id="delPosById" parameterType="_int">
+		delete from position where posid=#{0}
+	</delete>
+	<update id="updatePos" parameterType="Position">
+		update position set pname=#{pname},pdesc=#{pdesc} where posid=#{posid}
+	</update>
+</mapper>

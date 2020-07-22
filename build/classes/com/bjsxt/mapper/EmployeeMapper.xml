@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bjsxt.mapper.EmployeeMapper">
+
+	<insert id="save" parameterType="Employee">
+		insert into employee values(#{empid},#{password},#{deptno},#{posid},#{mgrid},
+		#{realName},#{sex},#{birthDate},#{hireDate},
+		<if test="leaveDate!=null and leaveDate!=''">
+			#{leaveDate},
+		</if>
+		<if test="leaveDate==null">
+			null,
+		</if>				
+		#{onDuty},#{empType},#{phone},#{qq},#{emerContactPerson},#{idCard})
+	</insert>
+	
+	<select id="check" resultType="Employee" parameterType="string">
+		select * from employee where empid=#{0}
+	</select>
+	<select id="findByType" resultType="Employee" parameterType="_int">
+		select * from employee where empType=#{0}
+	</select>
+	<resultMap type="Employee" id="smap">
+	<id property="empid" column="eempid"/>
+	<result property="deptno" column="edno"/>
+	<result property="posid" column="epid"/>
+	<result property="realName" column="ername"/>
+	<result property="sex" column="sex"/>
+	<result property="hireDate" column="hiredate"/>
+	<result property="phone" column="phone"/>
+	<result property="mgrid" column="mgrid"/>
+	<association property="dept" javaType="Department">
+		<id column="dno" property="deptno"/>
+		<result column="deptname" property="deptName"/>
+	</association>
+	<association property="position" javaType="Position">
+		<id column="pid" property="posid"/>
+		<result column="pname" property="pname"/>
+	</association>
+	<association property="mgr" javaType="Employee">
+		<id column="mempid" property="empid"/>
+		<result column="mrname" property="realName"/>
+	</association>
+	</resultMap>
+	<select id="findAll" resultMap="smap">
+select e.empid eempid,e.deptno edno,e.posid epid,e.realname ername,e.sex,e.hiredate,e.phone,
+d.deptno dno,d.deptname,
+p.posid pid,p.pname,
+e.mgrid,mgr.empid mempid,mgr.realname mrname
+ from employee e
+ join dept d
+ on e.deptno = d.deptno
+ join position p
+ on e.posid = p.posid
+ join employee mgr
+ on e.mgrid = mgr.empid
+	</select>
+	<!-- 动态查询 -->
+		<resultMap type="Employee" id="ssmap">
+	<id property="empid" column="eempid"/>
+	<result property="deptno" column="edno"/>
+	<result property="posid" column="epid"/>
+	<result property="realName" column="ername"/>
+	<result property="sex" column="sex"/>
+	<result property="hireDate" column="hiredate"/>
+	<result property="phone" column="phone"/>
+	<result property="mgrid" column="mgrid"/>
+	<association property="dept" javaType="Department">
+		<id column="dno" property="deptno"/>
+		<result column="deptname" property="deptName"/>
+	</association>
+	<association property="position" javaType="Position">
+		<id column="pid" property="posid"/>
+		<result column="pname" property="pname"/>
+	</association>
+	<association property="mgr" javaType="Employee">
+		<id column="mempid" property="empid"/>
+		<result column="mrname" property="realName"/>
+	</association>
+	</resultMap>
+	<select id="findEmp" resultMap="ssmap" parameterType="Employee">
+		select e.empid eempid,e.deptno edno,e.posid epid,e.realname ername,e.sex,e.hiredate,e.phone,
+d.deptno dno,d.deptname,
+p.posid pid,p.pname,
+e.mgrid,mgr.empid mempid,mgr.realname mrname
+ from employee e
+ join dept d
+ on e.deptno = d.deptno
+ join position p
+ on e.posid = p.posid
+ join employee mgr
+ on e.mgrid = mgr.empid
+	<where>
+		e.onDuty=#{onDuty}
+		<if test="empid!=null and empid!=''">
+			and e.empid=#{empid}
+		</if>
+		<if test="deptno!=null and deptno!=''">
+			and e.deptno=#{deptno}
+		</if>
+		<if test="hireDate!=null and hireDate!=''">
+			and e.hireDate=#{hireDate}
+		</if>
+	</where>
+	</select>
+	<delete id="delEmp" parameterType="string">
+		delete from employee where empid=#{0}
+	</delete>
+	<select id="findById" resultType="Employee" parameterType="string">
+		select * from employee where empid=#{0}
+	</select>
+	<update id="updEmp" parameterType="Employee">
+		update employee set deptno=#{deptno},mgrid=#{mgrid},realName=#{realName},sex=#{sex},
+birthDate=#{birthDate,jdbcType=DATE},hireDate=#{hireDate,jdbcType=DATE},leaveDate=#{leaveDate,jdbcType=DATE},
+idCard=#{idCard},emerContactPerson=#{emerContactPerson},phone=#{phone}
+		where empid=#{empid}
+	</update>
+</mapper>

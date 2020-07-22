@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bjsxt.mapper.ExpenseMapper">
+	<select id="nextVal" resultType="string">
+		select max(expid) from expense
+	</select>
+	<insert id="save" parameterType="Expense">
+		insert into expense values(#{expid},#{empid},#{totalAmount},#{expTime},#{expDesc},#{nextAuditorId},#{lastResult},#{status})
+	</insert>
+	<resultMap type="Expense" id="smap">
+		<id column="expid" property="expid"/>
+		<result column="empid" property="empid"/>
+		<result column="totalAmount" property="totalAmount"/>
+		<result column="expTime" property="expTime"/>
+		<result column="expDesc" property="expDesc"/>
+		<result column="nextAuditorId" property="nextAuditorId"/>
+		<result column="lastResult" property="lastResult"/>
+		<result column="status" property="status"/>
+		<association property="emp" javaType="Employee">
+			<id column="empid" property="empid"/>
+			<result column="realname" property="realName"/>
+		</association>	
+	</resultMap>
+	<select id="findByAuditorId" resultMap="smap">
+		select exp.* ,e.realname
+		from expense exp
+		join employee e
+		on exp.empid = e.empid
+		where nextauditor=#{0}
+	</select>
+	<update id="update" parameterType="Expense">
+		update expense set nextAuditor=#{nextAuditorId,jdbcType=VARCHAR},lastresult=#{lastResult},
+		status=#{status} where expid=#{expid}
+	</update>
+	<select id="findById" resultType="Expense" parameterType="_int">
+		select * from expense where expid=#{0}
+	</select>
+</mapper>

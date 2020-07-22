@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bjsxt.mapper.DutyMapper">
+<!-- 用户名是emprid -->
+	<select id="find" resultType="Duty">
+		select * from duty where emprid=#{0}
+	</select>
+	<!-- CREATE SEQUENCE seq_duty START WITH 1 INCREMENT BY 1 MAXVALUE 999999999;
+		在Oracle中设置自增长
+	 -->
+	<insert id="save" parameterType="Duty">
+		insert into duty values(default,#{empid},#{dtDate},#{signinTime},null)
+	</insert>
+	<!--签退 -->
+	<update id="signout">
+		update duty set SIGNOUTTIME=#{0} where DTID=#{1}
+	</update>
+	<!--  -->
+	<resultMap type="Duty" id="smap">
+		<id column="dtid" property="dtID"/>
+		<result column="emprid" property="empid"/>
+		<result column="dtdate" property="dtDate"/>
+		<result column="signintime" property="signinTime"/>
+		<result column="signouttime" property="signoutTime"/>
+		<association property="emp" javaType="Employee" >
+			<id column="empid" property="empid"/>
+			<result column="realname" property="realName"/>
+			<association property="dept" javaType="Department">
+				<id column="deptno" property="deptno"/>
+				<result column="deptName" property="deptName"/>
+			</association>
+		</association>
+	</resultMap>
+	<select id="find1" resultMap="smap">
+		select dtid,emprid,dtdate,signintime,signouttime,
+realname,
+d.deptno,d.deptName
+from duty
+left join employee e
+on emprid = empid
+left join dept d
+on e.deptno = d.deptno
+<where>
+	<if test="empid!=null and empid!=''">
+		and emprid = #{empid}
+	</if>
+	<if test="deptno!=0">
+		and d.deptno = #{deptno}
+	</if>
+	<if test="dtDate!=null and dtDate!=''">
+		and dtDate = #{dtDate}
+	</if>
+</where>
+	</select>
+</mapper>

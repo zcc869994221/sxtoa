@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bjsxt.mapper.PaymentMapper">
+	<insert id="save" parameterType="Payment">
+		insert into payment values(seq_payment.nextval,#{payEmpId},#{amount},#{payTime},#{expid},#{expEmpId})
+	</insert>
+	<resultMap type="Payment" id="smap">
+		<result column="payempid" property="payEmpId"/>
+		<result column="paytime" property="payTime"/>
+		<association property="exp" javaType="Expense">
+			<id column="expid" property="expid"/>
+			<collection property="itemList" javaType="ExpenseItem">
+				<id column="itemid" property="itemId"/>
+				<result column="type" property="type"/>
+				<result column="amount" property="amount"/>
+				<result column="itemdesc" property="itemDesc"/>
+			</collection>
+		</association>
+		<association property="payEmp" javaType="Employee">
+			<result column="realname" property="realName"/>
+		</association>
+		<association property="expEmp" javaType="Employee">
+			<result column="realname" property="realName"/>
+		</association>
+	</resultMap>
+	<select id="sel" resultMap="smap">
+	select item.itemid,item.type,item.amount,item.itemdesc, pm.paytime,exp.expid,emp.realname,emp2.realname
+from payment pm
+join expense exp
+on pm.expid = exp.expid
+join expenseitem item
+on exp.expid = item.expid
+join employee emp
+on pm.payempid=emp.empid
+join employee emp2
+on exp.empid = emp2.empid
+<where>
+	<if test="payEmpId!=null and payEmpId!=''">
+		and pm.payempid=#{payEmpId,jdbcType=VARCHAR}
+	</if>
+ 		
+	<if test="type!=0">
+	and item.type=#{type}
+	</if>
+</where>		
+order by exp.expid
+	</select>
+
+	<select id="getPieData" resultType="java.util.HashMap" parameterType="_int">
+select type,sum(amount) from expenseitem group by type order by type
+	</select>
+</mapper>
